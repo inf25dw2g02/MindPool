@@ -1,0 +1,61 @@
+services:
+  # MySQL Database
+  database:
+    image: mysql:8.0
+    container_name: mindpool_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: api_tasks
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mindpool_network
+
+  # Express.js Backend Server
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: mindpool_backend
+    restart: always
+    ports:
+      - "3001:3001"
+    depends_on:
+      - database
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID:-your_github_client_id}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET:-your_github_client_secret}
+      - CALLBACK_URL=${CALLBACK_URL:-http://localhost:3001/auth/github/callback}
+      - SESSION_SECRET=${SESSION_SECRET:-your-session-secret-key}
+    networks:
+      - mindpool_network
+
+  # React Frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mindpool_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_URL=http://localhost:3001
+    networks:
+      - mindpool_network
+
+volumes:
+  mysql_data:
+
+networks:
+  mindpool_network:
+    driver: bridge 
