@@ -1,4 +1,4 @@
-![MindPool Logo](https://github.com/inf25dw2g02/MindPool/blob/master/assets/mindpoologo.png)
+![MindPool Logo](https://github.com/inf25dw2g02/MindPool/blob/main/assets/mindpoologo.png)
 
 # 💡 MindPool
 
